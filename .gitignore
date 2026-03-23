@@ -1,0 +1,19 @@
+# Ignorar arquivos gerados automaticamente
+saida/
+*.docx
+*.pdf
+
+# Ignorar arquivos temporários do sistema
+*.log
+*.tmp
+*.swp
+
+# Ignorar cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignorar configurações locais
+.env
+.vscode/
+.idea/
