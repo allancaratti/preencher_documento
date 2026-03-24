@@ -4,6 +4,18 @@ import datetime
 import os
 from num2words import num2words
 
+# Definir fonte global via CSS
+st.markdown(
+    """
+    <style>
+    * {
+        font-family: 'PublicSans';
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Função para gerar documento
 def gerar_documento(modelo, contexto):
     doc = DocxTemplate(f"modelos/{modelo}.docx")
@@ -24,7 +36,7 @@ with col1:
 with col2:
     st.title("Gerador de Documentos")
     st.markdown("### Tahuna Enhenharia")
-    st.markdown("### Desenvolvido por: [Allan Mauad](https://www.linkedin.com/in/allancaratti/)")
+    st.markdown("Desenvolvido por: [Allan Mauad](https://www.linkedin.com/in/allancaratti/)")
 
 # Documentos
 documentos = {
