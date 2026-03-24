@@ -32,7 +32,7 @@ def formatar_cpf(cpf_num):
 # Interface
 col1, col2 = st.columns([1, 4])
 with col1:
-    st.image("image\\logo.png", width=100)
+    st.image(os.path.join(os.path.dirname(__file__), "image", "logo.png"), width=100)
 with col2:
     st.title("Gerador de Documentos")
     st.markdown("### Tahuna Enhenharia")
