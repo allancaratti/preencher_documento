@@ -1,7 +1,8 @@
-# Ignorar arquivos gerados automaticamente
+# Ignorar tudo dentro da pasta de saída
 saida/
-*.docx
-*.pdf
+/saida/*.docx
+/saida/*.pdf
+
 
 # Ignorar arquivos temporários do sistema
 *.log
