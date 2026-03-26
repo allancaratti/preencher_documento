@@ -55,7 +55,8 @@ documentos = {
     "Carta de Notificação por Falta CLT": {"campos": ["nome", "cargo", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_clt"},
     "Carta de Notificação por Falta PJ": {"campos": ["nome", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_pj"},
     "Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_inicio"], "arquivo": "contrato_pj"},
-    "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"}
+    "Rescisão de Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_fim", "dias_trbalhado"], "arquivo": "recisao_pj"},
+    "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"},
 }
 
 labels = {
@@ -71,7 +72,11 @@ labels = {
     "valor_diaria": "Valor da diária (R$) *",
     "valor_recibo": "Valor da gratificação (R$) *",
     "motivo_recibo": "Motivo da gratificação *",
-    "data_fim": "Data de desligamento *"
+    "data_fim": "Data de desligamento *",
+    "data_fim": "Data fim do contrato *",
+    "dias_trbalhado": "Quantidade de dias trabalhados *",
+    "valor_total": "Valor total da rescisão (R$)",
+    "valor_total_extenso": "Valor total por extenso"
 }
 
 # Interface
@@ -83,7 +88,7 @@ with col2:
     st.markdown("### Tahuna Engenharia")
     st.markdown("Desenvolvido por: [Allan Mauad](https://www.linkedin.com/in/allancaratti/)")
 
-# Montar opções do menu com ícones
+# Dropdown
 base_dir = os.path.dirname(os.path.abspath(__file__))
 opcoes_menu = []
 for nome, dados in documentos.items():
@@ -93,7 +98,6 @@ for nome, dados in documentos.items():
     else:
         opcoes_menu.append(f"❌ {nome}")
 
-# Dropdown já com ícones
 opcao_com_icone = st.selectbox("Escolha o documento:", opcoes_menu)
 opcao = opcao_com_icone.replace("✅ ", "").replace("❌ ", "")
 campos = documentos[opcao]["campos"]
@@ -149,30 +153,67 @@ if opcao == "Contrato PJ":
         valores["refeicao1"] = "Almoço"
         valores["refeicao2"] = ""
 
+# Rescisão de Contrato PJ
+if opcao == "Rescisão de Contrato PJ":
+    if valores.get("valor_diaria") and valores.get("dias_trbalhado"):
+        try:
+            valor_diaria_num = float(str(valores["valor_diaria"]).replace("R$", "").replace(",", "."))
+            dias = int(valores["dias_trbalhado"])
+            total = valor_diaria_num * dias
+
+            valores["valor_total"] = f"R$ {total:,.2f}".replace(".", ",")
+            reais = int(total)
+            centavos = int(round((total - reais) * 100))
+
+            if centavos > 0:
+                valores["valor_total_extenso"] = f"{num2words(reais, lang='pt_BR')} reais e {num2words(centavos, lang='pt_BR')} centavos"
+            else:
+                valores["valor_total_extenso"] = f"{num2words(reais, lang='pt_BR')} reais"
+        except Exception as e:
+            st.error(f"Erro ao calcular valor total: {e}")
+            valores["valor_total"] = ""
+            valores["valor_total_extenso"] = ""
+
 # Botão de gerar
 if st.button("Gerar Documento"):
     opcionais = ["alojamento", "refeicao1", "refeicao2"]
     faltando = [labels[k] for k in valores if k not in opcionais and not valores[k]]
 
     if not faltando:
+        # Converter datas para string
         for k, v in valores.items():
             if isinstance(v, datetime.date):
                 valores[k] = v.strftime("%d/%m/%Y")
         valores["Data_assinatura"] = datetime.date.today().strftime("%d/%m/%Y")
 
         arquivo_modelo = documentos[opcao]["arquivo"]
-        caminho_docx = gerar_documento(arquivo_modelo, valores)
 
+        # Lista de documentos gerados
+        lista_documentos = []
+
+        # Aqui você pode ter um loop sobre várias pessoas ou registros
+        # Exemplo simples: gerar apenas um documento e adicionar à lista
+        caminho_docx = gerar_documento(arquivo_modelo, valores)
         if caminho_docx:
-            st.success("Documento gerado com sucesso!")
-            with open(caminho_docx, "rb") as f:
-                st.download_button("⬇️ Baixar DOCX", f, file_name=os.path.basename(caminho_docx))
+            lista_documentos.append(caminho_docx)
+
+        # Se houver documentos gerados, mostrar botões de download
+        if lista_documentos:
+            st.success("Documentos gerados com sucesso!")
+            for i, caminho in enumerate(lista_documentos):
+                with open(caminho, "rb") as f:
+                    st.download_button(
+                        f"⬇️ Baixar {os.path.basename(caminho)}",
+                        f,
+                        file_name=os.path.basename(caminho),
+                        key=f"download_{i}_{os.path.basename(caminho)}"  # chave única
+                    )
     else:
         st.error("Por favor, preencha todos os campos obrigatórios (marcados com *).")
         st.warning("Campos faltando: " + ", ".join(faltando))
         for campo in campos:
             if labels.get(campo) in faltando:
-               st.markdown(
-                f"<div style='background-color:#ffcccc;padding:5px;'>⚠️ {labels[campo]} é obrigatório.</div>",
-                unsafe_allow_html=True
-            )
+                st.markdown(
+                    f"<div style='background-color:#ffcccc;padding:5px;'>⚠️ {labels[campo]} é obrigatório.</div>",
+                    unsafe_allow_html=True
+                )
