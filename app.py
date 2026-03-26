@@ -8,9 +8,7 @@ from num2words import num2words
 st.markdown(
     """
     <style>
-    * {
-        font-family: 'PublicSans';
-    }
+    * { font-family: 'PublicSans'; }
     </style>
     """,
     unsafe_allow_html=True
@@ -53,6 +51,7 @@ def formatar_cpf(cpf_num):
 # Documentos e mapeamento
 documentos = {
     "Carta de Aviso Prévio": {"campos": ["nome", "cargo", "data_ass", "data_inicio_aviso"], "arquivo": "carta_de_aviso_previo"},
+    "Carta de Aviso Prévio Indenizado": {"campos": ["nome", "cargo", "data_ass", "data_fim"], "arquivo": "aviso_previo_indenizado"},
     "Carta de Notificação por Falta CLT": {"campos": ["nome", "cargo", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_clt"},
     "Carta de Notificação por Falta PJ": {"campos": ["nome", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_pj"},
     "Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_inicio"], "arquivo": "contrato_pj"},
@@ -71,7 +70,8 @@ labels = {
     "cpf": "CPF *",
     "valor_diaria": "Valor da diária (R$) *",
     "valor_recibo": "Valor da gratificação (R$) *",
-    "motivo_recibo": "Motivo da gratificação *"
+    "motivo_recibo": "Motivo da gratificação *",
+    "data_fim": "Data de desligamento *"
 }
 
 # Interface
@@ -127,7 +127,7 @@ for campo in campos:
     else:
         valores[campo] = st.text_input(label)
 
-# Aviso prévio
+# Aviso prévio trabalhado
 if opcao == "Carta de Aviso Prévio":
     if valores["data_inicio_aviso"]:
         valores["data_fim_aviso"] = valores["data_inicio_aviso"] + datetime.timedelta(days=30)
@@ -172,7 +172,7 @@ if st.button("Gerar Documento"):
         st.warning("Campos faltando: " + ", ".join(faltando))
         for campo in campos:
             if labels.get(campo) in faltando:
-                st.markdown(
-                    f"<div style='background-color:#ffcccc;padding:5px;'>⚠️ {labels[campo]} é obrigatório.</div>",
-                    unsafe_allow_html=True
-                )
+               st.markdown(
+                f"<div style='background-color:#ffcccc;padding:5px;'>⚠️ {labels[campo]} é obrigatório.</div>",
+                unsafe_allow_html=True
+            )
