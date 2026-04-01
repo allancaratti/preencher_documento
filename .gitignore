@@ -1,18 +1,24 @@
 # =========================
 # Pasta de saída
 # =========================
-saida/
-*.docx
-*.pdf
-*.xlsx
-*.csv
+saida/*.docx
+saida/*.doc
+saida/*.pdf
+saida/*.xlsx
+saida/*.xls
+saida/*.csv
+saida/*.txt
 
 # =========================
 # Modelos de documentos
 # =========================
 modelos/*.docx
+modelos/*.doc
 modelos/*.pdf
 modelos/*.xlsx
+modelos/*.xls
+modelos/*.csv
+modelos/*.txt
 
 # =========================
 # Arquivos temporários
