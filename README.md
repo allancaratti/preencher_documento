@@ -1,35 +1,46 @@
 # 📄 Preenchedor de Documentos - Tahuna Engenharia - By: Allan Mauad - linkedin.com/in/allancaratti
 
-Script em Python com interface gráfica em **Streamlit** para automação do preenchimento de documentação padrão da construtora.  
-Permite selecionar modelos de documentos (carta de aviso prévio, carta de notificação por falta e contrato PJ), inserir dados específicos e gerar arquivos prontos para impressão e salvamento.
+Script em Python com interface gráfica em **Streamlit** para automação do preenchimento de documentação padrão da construtora.
+Permite selecionar modelos de documentos, inserir dados específicos e gerar arquivos prontos para impressão e salvamento.
+
 
 ---
 
 ## 🚀 Funcionalidades
 - Seleção de modelos de documentos pré-definidos.
 - Interface gráfica amigável via **Streamlit**.
-- Preenchimento automático de campos variáveis (nome, cargo, datas, CPF/CNPJ).
+- Preenchimento automático de campos variáveis (nome, cargo, datas, CPF, valores).
 - Geração de arquivos `.docx` prontos para impressão.
 - Download direto do documento gerado.
 - Estrutura modular para adicionar novos modelos facilmente.
+- Formatação automática de CPF.
+- Cálculo automático de valores e extenso (diária, gratificação, rescisão).
+- Registro de log com histórico dos documentos gerados.
+- Processamento em lote via planilha (Excel/CSV) exclusivo para o modelo Acordo de Banco de Horas.
+
 
 ---
 
 ## 🧰 Requisitos
-- Python 3.x  
+- Python 3.x
 - Bibliotecas:
-  - streamlit  
-  - docxtpl  
-  - datetime  
+- streamlit
+- docxtpl
+- datetime
+- num2words
+- pandas 
 
 ---
 
 ## 📂 Estrutura do Script
-1. Interface em Streamlit para seleção do tipo de documento.  
-2. Exibição dinâmica dos campos necessários conforme o modelo escolhido.  
-3. Preenchimento automático dos placeholders definidos nos arquivos `.docx`.  
-4. Geração do documento final na pasta `saida/`.  
-5. Opção de download direto pelo navegador.  
+- Interface em Streamlit para seleção do tipo de documento.
+- Exibição dinâmica dos campos necessários conforme o modelo escolhido.
+- Preenchimento automático dos placeholders definidos nos arquivos `.docx`.
+- Geração do documento final na pasta `saida/`.
+- Opção de download direto pelo navegador.
+- Registro de log em `saida/log.txt`.
+- Módulo de geração em lote para Banco de Horas via planilha.
+
 
 ---
 
@@ -55,13 +66,23 @@ http://localhost:8501
 ```
 ## 📑 Documentos Suportados
 - Carta de Aviso Prévio
-- Carta de Notificação por Falta
+- Carta de Aviso Prévio Indenizado
+- Carta de Notificação por Falta CLT
+- Carta de Notificação por Falta PJ
 - Contrato PJ
+- Rescisão de Contrato PJ
+- Recibo de Gratificação
+- Acordo de Banco de Horas (com opção de geração em lote via planilha)
 
 ## ⚠️ Notas
-- Os modelos devem estar na pasta modelos/ com placeholders compatíveis.
-- Os documentos gerados são salvos automaticamente na pasta saida/.
+- Os modelos devem estar na pasta `modelos/` com placeholders compatíveis.
+- Os documentos gerados são salvos automaticamente na pasta `saida/`.
+- O log de geração é salvo em `saida/log.txt`.
+- O recurso de geração em lote está disponível apenas para Acordo de Banco de Horas.
 - É possível expandir para novos tipos de documentos adicionando entradas no dicionário de configuração.
+
+
+
 
 ## 👨‍💻 Autor
 Desenvolvido por Allan Mauad

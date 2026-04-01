@@ -1,20 +1,71 @@
-# Ignorar tudo dentro da pasta de saída
+# =========================
+# Pasta de saída
+# =========================
 saida/
-/saida/*.docx
-/saida/*.pdf
+*.docx
+*.pdf
+*.xlsx
+*.csv
 
+# =========================
+# Modelos de documentos
+# =========================
+modelos/*.docx
+modelos/*.pdf
+modelos/*.xlsx
 
-# Ignorar arquivos temporários do sistema
+# =========================
+# Arquivos temporários
+# =========================
 *.log
 *.tmp
 *.swp
+*.bak
+*.cache
 
-# Ignorar cache do Python
+# =========================
+# Cache do Python
+# =========================
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Ignorar configurações locais
+# =========================
+# Ambientes virtuais
+# =========================
+venv/
+.venv/
+env/
+
+# =========================
+# Configurações locais
+# =========================
 .env
+.env.*
 .vscode/
 .idea/
+
+# =========================
+# Dados sensíveis
+# =========================
+*.key
+*.pem
+*.crt
+*.p12
+*.sqlite3
+*.db
+
+# Arquivos com credenciais
+config.json
+config.yaml
+config.yml
+credentials.json
+secrets.json
+token.json
+
+# =========================
+# Arquivos do sistema
+# =========================
+.DS_Store
+Thumbs.db
