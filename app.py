@@ -3,6 +3,7 @@ from docxtpl import DocxTemplate
 import datetime
 import os
 from num2words import num2words
+import pandas as pd  # Adicionado para suporte a planilhas
 
 # Definir fonte global via CSS
 st.markdown(
@@ -46,7 +47,8 @@ def registrar_log(modelo, nome, caminho_saida):
 
 # Função para formatar CPF
 def formatar_cpf(cpf_num):
-    return f"{cpf_num[:3]}.{cpf_num[3:6]}.{cpf_num[6:9]}-{cpf_num[9:]}"
+    cpf_limpo = ''.join(filter(str.isdigit, str(cpf_num))).zfill(11)
+    return f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
 
 # Documentos e mapeamento
 documentos = {
@@ -57,6 +59,7 @@ documentos = {
     "Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_inicio"], "arquivo": "contrato_pj"},
     "Rescisão de Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_fim", "dias_trbalhado"], "arquivo": "recisao_pj"},
     "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"},
+    "Acordo de Banco de Horas": {"campos": ["nome", "cpf"], "arquivo": "banco_horas"},
 }
 
 labels = {
@@ -73,7 +76,6 @@ labels = {
     "valor_recibo": "Valor da gratificação (R$) *",
     "motivo_recibo": "Motivo da gratificação *",
     "data_fim": "Data de desligamento *",
-    "data_fim": "Data fim do contrato *",
     "dias_trbalhado": "Quantidade de dias trabalhados *",
     "valor_total": "Valor total da rescisão (R$)",
     "valor_total_extenso": "Valor total por extenso"
@@ -88,7 +90,37 @@ with col2:
     st.markdown("### Tahuna Engenharia")
     st.markdown("Desenvolvido por: [Allan Mauad](https://www.linkedin.com/in/allancaratti/)")
 
-# Dropdown
+# --- NOVO BLOCO: PROCESSAMENTO EM LOTE ---
+st.sidebar.header("Configurações de Lote")
+lote_ativado = st.sidebar.checkbox("Ativar preenchimento via Planilha")
+
+if lote_ativado:
+    st.subheader("📦 Gerar Banco de Horas em Lote")
+    st.info("A planilha deve conter as colunas: nome, cpf, rg")
+    arquivo_lote = st.file_uploader("Selecione o arquivo Excel ou CSV", type=["xlsx", "csv"])
+    
+    if arquivo_lote:
+        try:
+            df = pd.read_csv(arquivo_lote) if arquivo_lote.name.endswith('.csv') else pd.read_excel(arquivo_lote)
+            st.dataframe(df.head())
+            
+            if st.button("🚀 Iniciar Geração em Massa"):
+                cont = 0
+                for _, row in df.iterrows():
+                    contexto_lote = {
+                        "nome": str(row["nome"]),
+                        "cpf": formatar_cpf(row["cpf"]),
+                        "Data_assinatura": datetime.date.today().strftime("%d/%m/%Y")
+                    }
+                    gerar_documento("banco_horas", contexto_lote)
+                    cont += 1
+                st.success(f"Finalizado! {cont} documentos de Banco de Horas gerados na pasta 'saida'.")
+        except Exception as e:
+            st.error(f"Erro ao processar planilha: {e}")
+    st.markdown("---")
+# --- FIM DO BLOCO DE LOTE ---
+
+# Dropdown (Manual)
 base_dir = os.path.dirname(os.path.abspath(__file__))
 opcoes_menu = []
 for nome, dados in documentos.items():
@@ -98,7 +130,7 @@ for nome, dados in documentos.items():
     else:
         opcoes_menu.append(f"❌ {nome}")
 
-opcao_com_icone = st.selectbox("Escolha o documento:", opcoes_menu)
+opcao_com_icone = st.selectbox("Escolha o documento para preenchimento manual:", opcoes_menu)
 opcao = opcao_com_icone.replace("✅ ", "").replace("❌ ", "")
 campos = documentos[opcao]["campos"]
 valores = {}
@@ -131,7 +163,7 @@ for campo in campos:
     else:
         valores[campo] = st.text_input(label)
 
-# Aviso prévio trabalhado
+# Regras de negócio específicas (Aviso Prévio, PJ, etc) permanecem inalteradas
 if opcao == "Carta de Aviso Prévio":
     if valores["data_inicio_aviso"]:
         valores["data_fim_aviso"] = valores["data_inicio_aviso"] + datetime.timedelta(days=30)
@@ -141,7 +173,6 @@ if opcao == "Carta de Aviso Prévio":
     valores["opcao1"] = "X" if escolha == "Redução de 2 horas diárias" else " "
     valores["opcao2"] = "X" if escolha == "Redução de 7 dias corridos" else " "
 
-# Contrato PJ
 if opcao == "Contrato PJ":
     alojamento_check = st.checkbox("Deseja incluir alojamento?")
     if alojamento_check:
@@ -153,18 +184,15 @@ if opcao == "Contrato PJ":
         valores["refeicao1"] = "Almoço"
         valores["refeicao2"] = ""
 
-# Rescisão de Contrato PJ
 if opcao == "Rescisão de Contrato PJ":
     if valores.get("valor_diaria") and valores.get("dias_trbalhado"):
         try:
             valor_diaria_num = float(str(valores["valor_diaria"]).replace("R$", "").replace(",", "."))
             dias = int(valores["dias_trbalhado"])
             total = valor_diaria_num * dias
-
             valores["valor_total"] = f"R$ {total:,.2f}".replace(".", ",")
             reais = int(total)
             centavos = int(round((total - reais) * 100))
-
             if centavos > 0:
                 valores["valor_total_extenso"] = f"{num2words(reais, lang='pt_BR')} reais e {num2words(centavos, lang='pt_BR')} centavos"
             else:
@@ -174,46 +202,27 @@ if opcao == "Rescisão de Contrato PJ":
             valores["valor_total"] = ""
             valores["valor_total_extenso"] = ""
 
-# Botão de gerar
-if st.button("Gerar Documento"):
+# Botão de gerar (Manual)
+if st.button("Gerar Documento Individual"):
     opcionais = ["alojamento", "refeicao1", "refeicao2"]
     faltando = [labels[k] for k in valores if k not in opcionais and not valores[k]]
 
     if not faltando:
-        # Converter datas para string
         for k, v in valores.items():
             if isinstance(v, datetime.date):
                 valores[k] = v.strftime("%d/%m/%Y")
         valores["Data_assinatura"] = datetime.date.today().strftime("%d/%m/%Y")
 
         arquivo_modelo = documentos[opcao]["arquivo"]
-
-        # Lista de documentos gerados
-        lista_documentos = []
-
-        # Aqui você pode ter um loop sobre várias pessoas ou registros
-        # Exemplo simples: gerar apenas um documento e adicionar à lista
         caminho_docx = gerar_documento(arquivo_modelo, valores)
+        
         if caminho_docx:
-            lista_documentos.append(caminho_docx)
-
-        # Se houver documentos gerados, mostrar botões de download
-        if lista_documentos:
-            st.success("Documentos gerados com sucesso!")
-            for i, caminho in enumerate(lista_documentos):
-                with open(caminho, "rb") as f:
-                    st.download_button(
-                        f"⬇️ Baixar {os.path.basename(caminho)}",
-                        f,
-                        file_name=os.path.basename(caminho),
-                        key=f"download_{i}_{os.path.basename(caminho)}"  # chave única
-                    )
+            st.success("Documento gerado com sucesso!")
+            with open(caminho_docx, "rb") as f:
+                st.download_button(
+                    f"⬇️ Baixar {os.path.basename(caminho_docx)}",
+                    f,
+                    file_name=os.path.basename(caminho_docx)
+                )
     else:
         st.error("Por favor, preencha todos os campos obrigatórios (marcados com *).")
-        st.warning("Campos faltando: " + ", ".join(faltando))
-        for campo in campos:
-            if labels.get(campo) in faltando:
-                st.markdown(
-                    f"<div style='background-color:#ffcccc;padding:5px;'>⚠️ {labels[campo]} é obrigatório.</div>",
-                    unsafe_allow_html=True
-                )
