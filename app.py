@@ -90,36 +90,6 @@ with col2:
     st.markdown("### Tahuna Engenharia")
     st.markdown("Desenvolvido por: [Allan Mauad](https://www.linkedin.com/in/allancaratti/)")
 
-# --- NOVO BLOCO: PROCESSAMENTO EM LOTE ---
-st.sidebar.header("Configurações de Lote")
-lote_ativado = st.sidebar.checkbox("Ativar preenchimento via Planilha")
-
-if lote_ativado:
-    st.subheader("📦 Gerar Banco de Horas em Lote")
-    st.info("A planilha deve conter as colunas: nome, cpf, rg")
-    arquivo_lote = st.file_uploader("Selecione o arquivo Excel ou CSV", type=["xlsx", "csv"])
-    
-    if arquivo_lote:
-        try:
-            df = pd.read_csv(arquivo_lote) if arquivo_lote.name.endswith('.csv') else pd.read_excel(arquivo_lote)
-            st.dataframe(df.head())
-            
-            if st.button("🚀 Iniciar Geração em Massa"):
-                cont = 0
-                for _, row in df.iterrows():
-                    contexto_lote = {
-                        "nome": str(row["nome"]),
-                        "cpf": formatar_cpf(row["cpf"]),
-                        "Data_assinatura": datetime.date.today().strftime("%d/%m/%Y")
-                    }
-                    gerar_documento("banco_horas", contexto_lote)
-                    cont += 1
-                st.success(f"Finalizado! {cont} documentos de Banco de Horas gerados na pasta 'saida'.")
-        except Exception as e:
-            st.error(f"Erro ao processar planilha: {e}")
-    st.markdown("---")
-# --- FIM DO BLOCO DE LOTE ---
-
 # Dropdown (Manual)
 base_dir = os.path.dirname(os.path.abspath(__file__))
 opcoes_menu = []
@@ -134,6 +104,37 @@ opcao_com_icone = st.selectbox("Escolha o documento para preenchimento manual:",
 opcao = opcao_com_icone.replace("✅ ", "").replace("❌ ", "")
 campos = documentos[opcao]["campos"]
 valores = {}
+
+# --- NOVO BLOCO: PROCESSAMENTO EM LOTE ---
+if opcao == "Acordo de Banco de Horas":
+    st.sidebar.header("Configurações de Lote")
+    lote_ativado = st.sidebar.checkbox("Ativar preenchimento via Planilha")
+
+    if lote_ativado:
+        st.subheader("📦 Gerar Banco de Horas em Lote")
+        st.info("A planilha deve conter as colunas: nome, cpf, rg")
+        arquivo_lote = st.file_uploader("Selecione o arquivo Excel ou CSV", type=["xlsx", "csv"])
+        
+        if arquivo_lote:
+            try:
+                df = pd.read_csv(arquivo_lote) if arquivo_lote.name.endswith('.csv') else pd.read_excel(arquivo_lote)
+                st.dataframe(df.head())
+                
+                if st.button("🚀 Iniciar Geração em Massa"):
+                    cont = 0
+                    for _, row in df.iterrows():
+                        contexto_lote = {
+                            "nome": str(row["nome"]),
+                            "cpf": formatar_cpf(row["cpf"]),
+                            "Data_assinatura": datetime.date.today().strftime("%d/%m/%Y")
+                        }
+                        gerar_documento("banco_horas", contexto_lote)
+                        cont += 1
+                    st.success(f"Finalizado! {cont} documentos de Banco de Horas gerados na pasta 'saida'.")
+            except Exception as e:
+                st.error(f"Erro ao processar planilha: {e}")
+        st.markdown("---")
+# --- FIM DO BLOCO DE LOTE ---
 
 st.subheader("Preencha os dados:")
 for campo in campos:
