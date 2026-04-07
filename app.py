@@ -60,6 +60,7 @@ documentos = {
     "Rescisão de Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_fim", "dias_trbalhado"], "arquivo": "recisao_pj"},
     "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"},
     "Acordo de Banco de Horas": {"campos": ["nome", "cpf"], "arquivo": "banco_horas"},
+    "Recibo para Terceiros": {"campos": ["nome", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo_terceiro"},
 }
 
 labels = {
