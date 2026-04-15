@@ -57,6 +57,7 @@ documentos = {
     "Carta de Notificação por Falta CLT": {"campos": ["nome", "cargo", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_clt"},
     "Carta de Notificação por Falta PJ": {"campos": ["nome", "data_falta"], "arquivo": "carta_de_notificacao_por_falta_pj"},
     "Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_inicio"], "arquivo": "contrato_pj"},
+    "Termo de recusa de registro em carteira": {"campos": ["nome", "cpf"], "arquivo": "concentimento_pj"},
     "Rescisão de Contrato PJ": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_diaria", "data_fim", "dias_trbalhado"], "arquivo": "recisao_pj"},
     "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"},
     "Acordo de Banco de Horas": {"campos": ["nome", "cpf"], "arquivo": "banco_horas"},
