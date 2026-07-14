@@ -62,6 +62,7 @@ documentos = {
     "Recibo de Gratificação": {"campos": ["nome", "nacionalidade", "cargo", "rg", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo"},
     "Acordo de Banco de Horas": {"campos": ["nome", "cpf"], "arquivo": "banco_horas"},
     "Recibo para Terceiros": {"campos": ["nome", "cpf", "valor_recibo", "motivo_recibo"], "arquivo": "recibo_terceiro"},
+    "Cancelamento de Aviso Prévio": {"campos": ["nome", "cargo", "data_aviso"], "arquivo": "cancelamento_aviso_previo"}
 }
 
 labels = {
@@ -80,7 +81,8 @@ labels = {
     "data_fim": "Data de desligamento *",
     "dias_trbalhado": "Quantidade de dias trabalhados *",
     "valor_total": "Valor total da rescisão (R$)",
-    "valor_total_extenso": "Valor total por extenso"
+    "valor_total_extenso": "Valor total por extenso",
+    "data_aviso": "Data de assinatura do aviso prévio *"
 }
 
 # Interface
