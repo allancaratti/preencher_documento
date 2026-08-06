@@ -157,9 +157,10 @@ for campo in campos:
             valores[campo] = ""
             valores[f"{campo}_extenso"] = ""
     elif campo == "cpf":
-        cpf_input = st.text_input(label, max_chars=11, help="Digite apenas números (11 dígitos)")
-        if cpf_input.isdigit() and len(cpf_input) == 11:
-            valores[campo] = formatar_cpf(cpf_input)
+        cpf_input = st.text_input(label, max_chars=14, help="Digite apenas números ou CPF formatado")
+        cpf_limpo = ''.join(filter(str.isdigit, cpf_input))
+        if len(cpf_limpo) == 11:
+            valores[campo] = formatar_cpf(cpf_limpo)
             st.info(f"CPF formatado: {valores[campo]}")
         else:
             valores[campo] = ""
